@@ -10,9 +10,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.voltlinescasestudy.presentation.main.MainPresenter
+import com.example.voltlinescasestudy.presentation.main.MainView
 import com.example.voltlinescasestudy.ui.theme.VoltLinesCaseStudyTheme
 
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(), MainView {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -23,6 +26,14 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun showLoading() {
+        TODO("Not yet implemented")
+    }
+
+    override fun showStations() {
+        TODO("Not yet implemented")
     }
 }
 
