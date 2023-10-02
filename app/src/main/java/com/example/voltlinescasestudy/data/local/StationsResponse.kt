@@ -5,5 +5,5 @@ import com.squareup.moshi.Json
 
 data class StationsResponse(
     @field:Json(name = "stations")
-    val articles: List<Station>,
+    val stations: List<Station>,
 )
