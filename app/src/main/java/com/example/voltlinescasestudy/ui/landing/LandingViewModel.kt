@@ -5,21 +5,36 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.voltlinescasestudy.data.location.DefaultLocationTracker
 import com.example.voltlinescasestudy.data.repository.StationsRepositoryImpl
 import com.example.voltlinescasestudy.util.Resource
+import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.collectIndexed
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
+@OptIn(ExperimentalCoroutinesApi::class)
 class LandingViewModel @Inject constructor(
-    private val repository: StationsRepositoryImpl
-) : ViewModel() {
+    private val repository: StationsRepositoryImpl,
+    private val locationTracker: DefaultLocationTracker
+    ) : ViewModel() {
 
     var state by mutableStateOf(StationState())
+    var userLocation: LatLng? = null
+
     init {
+        fetchCurrentLocation()
         fetchStations()
+    }
+
+    private fun fetchCurrentLocation() {
+        viewModelScope.launch {
+            locationTracker.getCurrentLocation()?.let {
+                userLocation = LatLng(it.latitude, it.longitude)
+            }
+        }
     }
 
     private fun fetchStations() {
