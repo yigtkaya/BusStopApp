@@ -1,6 +1,9 @@
 package com.example.voltlinescasestudy.di
 
+import android.app.Application
 import com.example.voltlinescasestudy.data.remote.StationsApi
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,5 +24,11 @@ object AppModule {
             .addConverterFactory(MoshiConverterFactory.create())
             .build()
             .create(StationsApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFusedLocationProviderClient(app: Application) : FusedLocationProviderClient {
+        return LocationServices.getFusedLocationProviderClient(app)
     }
 }

@@ -22,23 +22,17 @@ class LandingViewModel @Inject constructor(
     ) : ViewModel() {
 
     var state by mutableStateOf(StationState())
-    var userLocation: LatLng? = null
+    var userLocation: LatLng = LatLng(0.123, 5.245)
 
     init {
-        fetchCurrentLocation()
         fetchStations()
-    }
-
-    private fun fetchCurrentLocation() {
-        viewModelScope.launch {
-            locationTracker.getCurrentLocation()?.let {
-                userLocation = LatLng(it.latitude, it.longitude)
-            }
-        }
     }
 
     private fun fetchStations() {
         viewModelScope.launch {
+            locationTracker.getCurrentLocation()?.let {
+                userLocation = LatLng(it.latitude, it.longitude)
+            }
             repository.getStations()
                 .collect { result ->
                     when(result) {
