@@ -8,7 +8,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.voltlinescasestudy.data.location.DefaultLocationTracker
 import com.example.voltlinescasestudy.data.repository.StationsRepositoryImpl
 import com.example.voltlinescasestudy.util.Resource
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.MarkerState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,17 +25,29 @@ class LandingViewModel @Inject constructor(
     ) : ViewModel() {
 
     var state by mutableStateOf(StationState())
-    var userLocation: LatLng = LatLng(0.123, 5.245)
+    var mapState by mutableStateOf(MapState())
+    var cameraPositionState by mutableStateOf(CameraPositionState()) // Initialize it as null
 
     init {
+        fetchCurrentLocation()
         fetchStations()
     }
 
-    private fun fetchStations() {
+    private fun fetchCurrentLocation() {
         viewModelScope.launch {
             locationTracker.getCurrentLocation()?.let {
-                userLocation = LatLng(it.latitude, it.longitude)
+                mapState = mapState.copy(
+                    lastKnownLocation = it
+                )
+                cameraPositionState = CameraPositionState(
+                    position = CameraPosition.fromLatLngZoom(LatLng(it.latitude, it.longitude), 15f)
+                )
             }
+        }
+    }
+
+    private fun fetchStations() {
+            viewModelScope.launch {
             repository.getStations()
                 .collect { result ->
                     when(result) {
@@ -49,5 +63,8 @@ class LandingViewModel @Inject constructor(
                     }
                 }
         }
+    }
+    fun calculateInitialCameraPosition(userLocation: LatLng): CameraPosition {
+        return CameraPosition.fromLatLngZoom(userLocation, 10f)
     }
 }
