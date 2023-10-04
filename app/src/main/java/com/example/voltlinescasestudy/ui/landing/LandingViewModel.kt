@@ -9,6 +9,7 @@ import com.example.voltlinescasestudy.data.location.DefaultLocationTracker
 import com.example.voltlinescasestudy.data.repository.StationsRepositoryImpl
 import com.example.voltlinescasestudy.util.Resource
 import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.MarkerState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch

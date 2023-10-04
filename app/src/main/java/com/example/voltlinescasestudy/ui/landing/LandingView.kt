@@ -1,6 +1,7 @@
 package com.example.voltlinescasestudy.ui.landing
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -18,21 +19,27 @@ fun LandingView(
 
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = viewModel.state.isRefreshing)
     val state = viewModel.state
+    if (!state.isLoading) {
+
+    }
     val userLocation = viewModel.userLocation
     val userLocationState = MarkerState(position = userLocation)
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(userLocation, 10f)
     }
 
-    GoogleMap (
-        modifier = Modifier.fillMaxSize(),
-        cameraPositionState = cameraPositionState
-    ) {
+    if(!state.isLoading) {
+        GoogleMap (
+            modifier = Modifier.fillMaxSize(),
+            cameraPositionState = cameraPositionState
+        ) {
 
-        Marker(
-            state = userLocationState,
-            title= "marker in user location"
-        )
+            Marker(
+                state = userLocationState,
+                title= "marker in user location"
+            )
+        }
+    } else {
+        CircularProgressIndicator()
     }
-
 }

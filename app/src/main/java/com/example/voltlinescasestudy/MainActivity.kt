@@ -7,6 +7,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -14,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.lifecycleScope
 import com.example.voltlinescasestudy.ui.landing.LandingViewModel
 import com.example.voltlinescasestudy.ui.theme.VoltLinesCaseStudyTheme
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -24,13 +24,10 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity(){
 
-    private val viewModel: LandingViewModel by viewModels()
     private lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,7 +46,7 @@ class MainActivity : ComponentActivity(){
             VoltLinesCaseStudyTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    LandingView()
+                        LandingView()
                 }
             }
         }
@@ -59,7 +56,6 @@ class MainActivity : ComponentActivity(){
 fun LandingView(
     viewModel: LandingViewModel = hiltViewModel(),
 ) {
-
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = viewModel.state.isRefreshing)
     val state = viewModel.state
     val userLocation = viewModel.userLocation
@@ -68,17 +64,16 @@ fun LandingView(
         position = CameraPosition.fromLatLngZoom(userLocation, 10f)
     }
 
-    GoogleMap (
-        modifier = Modifier.fillMaxSize(),
-        cameraPositionState = cameraPositionState
-    ) {
+        GoogleMap (
+            modifier = Modifier.fillMaxSize(),
+            cameraPositionState = cameraPositionState
+        ) {
 
-        Marker(
-            state = userLocationState,
-            title= "marker in user location"
-        )
-    }
-
+            Marker(
+                state = userLocationState,
+                title= "marker in user location"
+            )
+        }
 }
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {

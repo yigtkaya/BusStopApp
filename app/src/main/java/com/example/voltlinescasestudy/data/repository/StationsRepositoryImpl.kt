@@ -23,7 +23,7 @@ class StationsRepositoryImpl @Inject constructor(
                 val response = stationsApi.getStations()
 
                 if(response.isSuccessful) {
-                    response.body()?.stations ?: emptyList()
+                    response.body()
                 } else {
                     emptyList()
                 }

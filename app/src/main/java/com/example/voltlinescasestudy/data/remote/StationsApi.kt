@@ -1,6 +1,7 @@
 package com.example.voltlinescasestudy.data.remote
 
 import com.example.voltlinescasestudy.data.local.StationsResponse
+import com.example.voltlinescasestudy.domain.models.Station
 import com.example.voltlinescasestudy.domain.models.Trip
 import retrofit2.Response
 import retrofit2.http.GET
@@ -10,7 +11,7 @@ import retrofit2.http.Url
 interface StationsApi {
 
     @GET("stations")
-    suspend fun getStations() : Response<StationsResponse>
+    suspend fun getStations() : Response<List<Station>>
 
     @POST()
     suspend fun bookTrip(@Url url: String) : Response<Trip>
