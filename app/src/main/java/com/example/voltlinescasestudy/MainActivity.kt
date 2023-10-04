@@ -24,16 +24,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.voltlinescasestudy.domain.models.Station
 import com.example.voltlinescasestudy.ui.landing.LandingViewModel
 import com.example.voltlinescasestudy.ui.theme.VoltLinesCaseStudyTheme
 import com.google.android.gms.maps.model.BitmapDescriptor
@@ -78,9 +81,21 @@ fun LandingView(
     viewModel: LandingViewModel = hiltViewModel(),
 ) {
     val state = viewModel.state
-    var isSelected = true
     val cameraPositionState = viewModel.cameraPositionState
     val mapProperties by remember { mutableStateOf(MapProperties(isMyLocationEnabled = true)) }
+
+    var selectedStation by remember {
+        mutableStateOf<Station?>(null)
+    }
+
+    val onSelectionChange = { station: Station ->
+        if(selectedStation != station) {
+            selectedStation = station
+        } else {
+            selectedStation = null
+        }
+    }
+
 
     if(state.isLoading) {
             Box(
@@ -94,8 +109,9 @@ fun LandingView(
                 modifier = Modifier.fillMaxSize(),
                 floatingActionButtonPosition = FabPosition.Center,
                 floatingActionButton = {
-                    if(isSelected) {
+                    selectedStation?.let {
                         FABButton()
+                        // navigate to list view of trips
                     }
                 },
             ) {
@@ -114,7 +130,9 @@ fun LandingView(
                         StationMarker(
                             context = LocalContext.current,
                             position = position,
-                            title = station.name
+                            title = station.name,
+                            isSelected = selectedStation == station,
+                            onMarkerClick = { onSelectionChange(station) }
                         )
                     }
                 }
@@ -127,7 +145,7 @@ fun LandingView(
 fun FABButton() {
     Box(
         modifier = Modifier
-            .padding(all = 16.dp)
+            .padding(all = 18.dp)
             .clip(shape = RoundedCornerShape(24.dp))
             .background(
                 color = Color.Blue
@@ -139,11 +157,12 @@ fun FABButton() {
             text = "List Trips",
             textAlign = TextAlign.Center,
             color = Color.White,
-            fontSize = 16.sp,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .background(Color.Transparent)
                 .padding(
-                    vertical = 8.dp, horizontal = 12.dp
+                    vertical = 10.dp, horizontal = 12.dp
                 )
         )
     }
@@ -153,7 +172,8 @@ fun StationMarker(
     context: Context,
     position: LatLng,
     title: String,
-    isSelected: Boolean = false
+    isSelected: Boolean,
+    onMarkerClick: () -> Unit
 ) {
 
     val defaultIcon = bitmapDescriptorFromVector(
@@ -163,18 +183,14 @@ fun StationMarker(
         context, R.drawable.selected_point
     )
 
-    val icon by remember {
-        mutableStateOf(if (isSelected) selectedIcon else defaultIcon)
-    }
-
-    val markerState = remember { mutableStateOf(MarkerState(position = position)) }
+    val icon = if (isSelected) selectedIcon else defaultIcon
 
     Marker(
         state = MarkerState(position = position),
         title = title,
         icon = icon,
         onClick = {
-
+            onMarkerClick()
             true
         }
     )
