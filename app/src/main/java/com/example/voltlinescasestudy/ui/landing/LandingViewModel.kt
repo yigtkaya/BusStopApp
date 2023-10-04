@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.voltlinescasestudy.data.location.DefaultLocationTracker
 import com.example.voltlinescasestudy.data.repository.StationsRepositoryImpl
+import com.example.voltlinescasestudy.domain.models.Station
 import com.example.voltlinescasestudy.util.Resource
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -33,6 +34,14 @@ class LandingViewModel @Inject constructor(
         fetchStations()
     }
 
+    fun onEvent(event: StationMarkerEvent){
+        when(event) {
+            is StationMarkerEvent.Refresh -> {}
+            is StationMarkerEvent.onClick -> {
+
+            }
+        }
+    }
     private fun fetchCurrentLocation() {
         viewModelScope.launch {
             locationTracker.getCurrentLocation()?.let {
