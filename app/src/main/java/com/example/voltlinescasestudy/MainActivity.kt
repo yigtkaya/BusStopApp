@@ -9,23 +9,31 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,13 +45,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.example.voltlinescasestudy.domain.models.Station
-import com.example.voltlinescasestudy.domain.models.Trip
 import com.example.voltlinescasestudy.ui.landing.LandingViewModel
 import com.example.voltlinescasestudy.ui.theme.VoltLinesCaseStudyTheme
 import com.google.android.gms.maps.model.BitmapDescriptor
@@ -88,7 +92,10 @@ class MainActivity : ComponentActivity(){
                     }
                     composable("trip_list") {
                         TripListView(
-                            sharedViewModel
+                            sharedViewModel,
+                            navigateBack = {
+                                navController.popBackStack()
+                            }
                         )
                     }
                 }
@@ -97,16 +104,72 @@ class MainActivity : ComponentActivity(){
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TripListView(
     viewModel: LandingViewModel,
+    navigateBack: () -> Unit
     ) {
 
-    val selectedStation = viewModel.selectedStation
+    val trips = viewModel.selectedStation?.trips ?: emptyList()
 
-    println(selectedStation?.name)
-    Box {
-            Text(text = selectedStation?.name ?: "Boş")
+    Scaffold (
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(text = "Trips of Station ${viewModel.selectedStation?.name}")
+                },
+                navigationIcon = {
+                    IconButton(onClick = {navigateBack()}) {
+                        Icon(Icons.Filled.ArrowBack, "backIcon")
+                    }
+                },
+
+            )
+        }
+    ){ paddingValues ->
+        Column (
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+                .background(color = Color.LightGray),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ){
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                content = {
+                    items(trips.size) {
+                        TripRowItem(
+                            tripName = trips[it].bus_name,
+                            tripTime = trips[it].time,
+                        )
+                    }
+                }
+            )
+        }
+    }
+}
+@Composable
+fun TripRowItem(
+    tripName: String,
+    tripTime: String,
+) {
+    
+    Row (
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+    ){
+        Text(
+            text = tripName,
+            fontWeight = FontWeight.Bold,
+            fontSize = 24.sp
+        )
+        Text(text = tripTime, fontSize = 24.sp)
+        FilledTonalButton(onClick = { /*APİ POST REQ*/ }) {
+            Text(text = "Book")
+        }
     }
 }
 @OptIn(ExperimentalMaterial3Api::class)
