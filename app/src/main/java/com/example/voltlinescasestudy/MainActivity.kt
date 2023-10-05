@@ -37,9 +37,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.voltlinescasestudy.domain.models.Station
 import com.example.voltlinescasestudy.domain.models.Trip
 import com.example.voltlinescasestudy.ui.landing.LandingViewModel
@@ -73,17 +75,21 @@ class MainActivity : ComponentActivity(){
         setContent {
             VoltLinesCaseStudyTheme {
                 val navController =  rememberNavController()
+                val sharedViewModel: LandingViewModel = hiltViewModel()
                 // A surface container using the 'background' color from the theme
                 NavHost(navController = navController, startDestination = "landing") {
                     composable("landing") {
                         LandingView(
+                            sharedViewModel,
                             onFabClicked = {
                                 navController.navigate("trip_list")
                             }
                         )
                     }
                     composable("trip_list") {
-                        TripListView()
+                        TripListView(
+                            sharedViewModel
+                        )
                     }
                 }
             }
@@ -93,7 +99,7 @@ class MainActivity : ComponentActivity(){
 
 @Composable
 fun TripListView(
-    viewModel: LandingViewModel = hiltViewModel(),
+    viewModel: LandingViewModel,
     ) {
 
     val selectedStation = viewModel.selectedStation
@@ -106,7 +112,7 @@ fun TripListView(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LandingView(
-    viewModel: LandingViewModel = hiltViewModel(),
+    viewModel: LandingViewModel,
     onFabClicked: () -> Unit
 ) {
     val state = viewModel.state
