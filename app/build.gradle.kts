@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace = "com.example.voltlinescasestudy"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.voltlinescasestudy"
         minSdk = 26
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -59,6 +59,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
 
+    implementation("androidx.navigation:navigation-compose:2.7.4")
     // dagger-hilt
     implementation("com.google.dagger:hilt-android:2.44")
     implementation("com.google.android.gms:play-services-location:21.0.1")

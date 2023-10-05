@@ -2,11 +2,13 @@ package com.example.voltlinescasestudy.ui.landing
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.voltlinescasestudy.data.location.DefaultLocationTracker
 import com.example.voltlinescasestudy.data.repository.StationsRepositoryImpl
+import com.example.voltlinescasestudy.domain.models.Station
 import com.example.voltlinescasestudy.util.Resource
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -26,18 +28,18 @@ class LandingViewModel @Inject constructor(
     var state by mutableStateOf(StationState())
     var mapState by mutableStateOf(MapState())
     var cameraPositionState by mutableStateOf(CameraPositionState()) // Initialize it as null
+    var selectedStation by mutableStateOf<Station?>(null)
 
     init {
         fetchCurrentLocation()
         fetchStations()
     }
 
-    fun onEvent(event: StationMarkerEvent){
-        when(event) {
-            is StationMarkerEvent.Refresh -> {}
-            is StationMarkerEvent.onClick -> {
-
-            }
+    val onSelectionChange = { station: Station ->
+        if(selectedStation != station) {
+            selectedStation = station
+        } else {
+            selectedStation = null
         }
     }
     private fun fetchCurrentLocation() {

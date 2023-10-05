@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -36,7 +37,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.voltlinescasestudy.domain.models.Station
+import com.example.voltlinescasestudy.domain.models.Trip
 import com.example.voltlinescasestudy.ui.landing.LandingViewModel
 import com.example.voltlinescasestudy.ui.theme.VoltLinesCaseStudyTheme
 import com.google.android.gms.maps.model.BitmapDescriptor
@@ -67,35 +72,48 @@ class MainActivity : ComponentActivity(){
 
         setContent {
             VoltLinesCaseStudyTheme {
+                val navController =  rememberNavController()
                 // A surface container using the 'background' color from the theme
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                        LandingView()
+                NavHost(navController = navController, startDestination = "landing") {
+                    composable("landing") {
+                        LandingView(
+                            onFabClicked = {
+                                navController.navigate("trip_list")
+                            }
+                        )
+                    }
+                    composable("trip_list") {
+                        TripListView()
+                    }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun TripListView(
+    viewModel: LandingViewModel = hiltViewModel(),
+    ) {
+
+    val selectedStation = viewModel.selectedStation
+
+    println(selectedStation?.name)
+    Box {
+            Text(text = selectedStation?.name ?: "Boş")
     }
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LandingView(
     viewModel: LandingViewModel = hiltViewModel(),
+    onFabClicked: () -> Unit
 ) {
     val state = viewModel.state
     val cameraPositionState = viewModel.cameraPositionState
     val mapProperties by remember { mutableStateOf(MapProperties(isMyLocationEnabled = true)) }
 
-    var selectedStation by remember {
-        mutableStateOf<Station?>(null)
-    }
-
-    val onSelectionChange = { station: Station ->
-        if(selectedStation != station) {
-            selectedStation = station
-        } else {
-            selectedStation = null
-        }
-    }
-
+    val selectedStation = viewModel.selectedStation
 
     if(state.isLoading) {
             Box(
@@ -110,8 +128,9 @@ fun LandingView(
                 floatingActionButtonPosition = FabPosition.Center,
                 floatingActionButton = {
                     selectedStation?.let {
-                        FABButton()
-                        // navigate to list view of trips
+                        FABButton(
+                            onFabClicked = onFabClicked
+                        )
                     }
                 },
             ) {
@@ -132,7 +151,7 @@ fun LandingView(
                             position = position,
                             title = station.name,
                             isSelected = selectedStation == station,
-                            onMarkerClick = { onSelectionChange(station) }
+                            onMarkerClick = { viewModel.onSelectionChange(station) }
                         )
                     }
                 }
@@ -142,7 +161,9 @@ fun LandingView(
 }
 
 @Composable
-fun FABButton() {
+fun FABButton(
+    onFabClicked: () -> Unit
+) {
     Box(
         modifier = Modifier
             .padding(all = 18.dp)
@@ -150,7 +171,8 @@ fun FABButton() {
             .background(
                 color = Color.Blue
             )
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable { onFabClicked() },
         contentAlignment = Alignment.Center
         ) {
         Text(
